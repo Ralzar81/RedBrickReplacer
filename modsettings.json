@@ -1,0 +1,49 @@
+{
+    "Version": "1.0",
+    "Sections":
+    [       
+        {
+            "Name": "ReplaceTeleporterTexture",
+            "Description": "Replaces the classic red brick walls with another texture when the wall is a teleporter.",
+            "IsAdvanced": false,
+            "Keys":
+            [
+                {
+                    "Options": [
+                    "Off",
+                    "Stars",
+                    "Lava"
+                    ],
+                    "Value": 1,
+                    "Name": "TeleporterTexture",
+                    "Description": "Select how walls that are teleporters will appear.",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.MultipleChoiceKey"
+                }
+            ],
+            "$version": "v1"
+        },
+                {
+            "Name": "ReplaceRedBrickTexture",
+            "Description": "Replaces the classic red brick walls with another texture when it is just a wall.",
+            "IsAdvanced": false,
+            "Keys":
+            [
+                {
+                    "Options": [
+                    "Off",
+                    "Grey Bricks",
+                    "Bricked Up Exit"
+                    ],
+                    "Value": 2,
+                    "Name": "WallTexture",
+                    "Description": "Select how walls that are just walls will appear.",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.MultipleChoiceKey"
+                }
+            ],
+            "$version": "v1"
+        },
+    
+    ]
+}

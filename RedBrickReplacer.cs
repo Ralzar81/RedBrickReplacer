@@ -9,6 +9,7 @@ using DaggerfallWorkshop.Game.Utility.ModSupport;
 using DaggerfallWorkshop;
 using DaggerfallConnect;
 using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings;
+using DaggerfallWorkshop.Utility;
 
 public class RedBrickReplacer : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class RedBrickReplacer : MonoBehaviour
     [Invoke(StateManager.StateTypes.Start, 0)]
     public static void Init(InitParams initParams)
     {
-        Debug.Log("[RedBrickWallFix] Initializing mod");
+        Debug.Log("[RedBrickReplacer] Initializing mod");
         mod = initParams.Mod;
         var go = new GameObject(mod.Title);
         go.AddComponent<RedBrickReplacer>();
@@ -31,7 +32,7 @@ public class RedBrickReplacer : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("[RedBrickWallFix] Awake");
+        Debug.Log("[RedBrickReplacer] Awake");
         ModSettings settings = mod.GetSettings();
         teleArchive = 094;
         teleRecord = 0;
@@ -50,7 +51,7 @@ public class RedBrickReplacer : MonoBehaviour
                 break;
             case 2:
                 teleArchive = 356;
-                teleRecord = 2;
+                teleRecord = 0;
                 break;
         }
         switch (settings.GetValue<int>("ReplaceRedBrickTexture", "WallTexture"))
@@ -70,27 +71,27 @@ public class RedBrickReplacer : MonoBehaviour
         }
 
         mod.IsReady = true;
-        Debug.Log("[RedBrickWallFix] mod.IsReady = true");
+        Debug.Log("[RedBrickReplacer] mod.IsReady = true");
     }
 
     private static void FindAndFixRedBrickWalls(PlayerEnterExit.TransitionEventArgs args)
     {
-        Debug.Log("[RedBrickWallFix] Running FindAndFixRedBrickWalls");
+        Debug.Log("[RedBrickReplacer] Running FindAndFixRedBrickWalls");
         MeshCollider[] foundMeshColliders = (MeshCollider[])FindObjectsOfType(typeof(MeshCollider));
         GameObject wallObj;
-        Debug.Log("[RedBrickWallFix] meshColliders found = " + foundMeshColliders.Length.ToString());
+        Debug.Log("[RedBrickReplacer] meshColliders found = " + foundMeshColliders.Length.ToString());
         foreach (MeshCollider mesh in foundMeshColliders)
         {
             wallObj = mesh.transform.gameObject;
             bool aFlag = wallObj.GetComponent<DaggerfallAction>() != null;
+            bool animMat = wallObj.GetComponent<AnimatedMaterial>() != null;
+            MeshRenderer wallMR = wallObj.GetComponent<MeshRenderer>();
 
             if (aFlag && wallObj.GetComponent<DaggerfallAction>().ActionFlag == DFBlock.RdbActionFlags.Teleport && teleArchive != 094)
             {
-                Debug.Log("[RedBrickWallFix] Teleporter");
+                Debug.Log("[RedBrickReplacer] Teleporter");
                 string materialName = "TEXTURE.094 [Index=0] (Instance)";
 
-
-                MeshRenderer wallMR = wallObj.GetComponent<MeshRenderer>();
                 Material[] materials = wallMR.materials;
 
                 for (int i = 0; i < materials.Length; i++)
@@ -100,25 +101,32 @@ public class RedBrickReplacer : MonoBehaviour
                         Material newMaterial = DaggerfallUnity.Instance.MaterialReader.GetMaterial(teleArchive, teleRecord);
                         materials[i] = newMaterial;
                         wallMR.materials = materials;
+                        if (teleArchive == 356)
+                        {
+                            CachedMaterial cachedMaterial;
+                            DaggerfallUnity.Instance.MaterialReader.GetCachedMaterial(teleArchive, teleRecord, 0, out cachedMaterial);
+                            CachedMaterial[] cachedMaterialsOut = new CachedMaterial[] { cachedMaterial };
+                            GameObjectHelper.AssignAnimatedMaterialComponent(cachedMaterialsOut, wallObj);
+                            wallObj.GetComponent<AnimatedMaterial>().FramesPerSecond = 2;
+                        }
                         break;
                     }
                 }
             }
-            else if (wallArchive != 094)
+            else if (wallArchive != 094 && !animMat)
             {
-                Debug.Log("[RedBrickWallFix] Not Teleporter");
+                Debug.Log("[RedBrickReplacer] Not Teleporter");
                 string materialName = "TEXTURE.094 [Index=0] (Instance)";
 
-                MeshRenderer wallMR = wallObj.GetComponent<MeshRenderer>();
-                Material[] materials = wallMR.materials;
-
-                for (int i = 0; i < materials.Length; i++)
+                Material[] notTeleMaterials = wallMR.materials;
+                for (int i = 0; i < notTeleMaterials.Length; i++)
                 {
-                    if (materials[i].name == materialName)
+
+                    if (notTeleMaterials[i].name == materialName)
                     {
                         Material newMaterial = DaggerfallUnity.Instance.MaterialReader.GetMaterial(wallArchive, wallRecord);
-                        materials[i] = newMaterial;
-                        wallMR.materials = materials;
+                        notTeleMaterials[i] = newMaterial;
+                        wallMR.materials = notTeleMaterials;
                         break;
                     }
                 }

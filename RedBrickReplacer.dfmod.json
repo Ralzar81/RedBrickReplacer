@@ -1,8 +1,8 @@
 {
     "ModTitle": "Red Brick Replacer",
-    "ModVersion": "1.0.0",
+    "ModVersion": "1.0.1",
     "ModAuthor": "Ralzar",
-    "DFUnity_Version": "0.14.0",
+    "DFUnity_Version": "0.14.5",
     "ModDescription": "Lets you change the appearance of Red Brick walls, so you can tell the difference between a wall and a teleporter.",
     "GUID": "d4602d6c-6a8e-4948-a930-db2d34ea4d74",
     "Files": [
